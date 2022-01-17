@@ -4,13 +4,9 @@
 # job-related income parameters
 # --------------------------------------------------
 
-# figure this out based on time of your latest paystub
-pay_periods_per_year = 26
-bonus_payouts_per_year = 2
-remaining_pay_periods = 25
-remaining_bonus_payouts = 2
-
 # facts obtained from your latest paystub
+pay_periods_per_year = 26
+remaining_pay_periods = 25
 annual_salary = 123456.78
 last_withholding = 123.45
 ytd_withholding = 123.45
@@ -37,6 +33,8 @@ pre_tax_deductions_per_period = (
 
 # guesstimate how much your bonus multiplier will be.
 # assumption: bonus = (multiplier * salary / payouts per year)
+bonus_payouts_per_year = 2
+remaining_bonus_payouts = 2
 bonus_multiplier = 0.125
 
 # income from bonus and RSUs. guesstimate a price for when the RSUs

@@ -14,14 +14,10 @@
 from laws_2022 import *
 from data_2022 import *
 
-# --------------------------------------------------
-# calculation
-# --------------------------------------------------
-
 def do_tax(base, x, brackets):
     total = 0.00
     for rate, ceil in brackets:
-        if base < ceil:
+        if base <= ceil:
             total += rate * x
             break
         curr = max(0.00, ceil - base + x)
