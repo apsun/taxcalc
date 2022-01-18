@@ -31,15 +31,15 @@ pre_tax_deductions_per_period = (
     + 0.00
 )
 
-# Guesstimate how much your bonus multiplier will be.
-# Assumption: bonus = (multiplier * salary / payouts per year)
+# Income from bonus. Guesstimate how much your bonus multiplier will
+# be. Assumption: bonus = (multiplier * salary / payouts per year)
 bonus_payouts_per_year = 2
 remaining_bonus_payouts = 2
 bonus_multiplier = 0.125
 
-# Income from bonus and RSUs. Guesstimate a price for when the RSUs
-# will vest (assuming you sell them immediately). Do NOT include
-# shares that have already vested and are included in your gross pay.
+# Income from RSUs. Guesstimate a price for when the RSUs will vest
+# (assuming you sell them immediately). Do NOT include shares that
+# have already vested and are included in your gross pay.
 rsu_price = 123.45
 remaining_rsu_shares = (
     + 100  # Feb
