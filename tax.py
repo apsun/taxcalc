@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 #
-# a really basic federal tax withholding calculator
-# only good to a first degree approximation, no warranty provided
+# A basic federal tax withholding calculator. NO WARRANTY PROVIDED.
+# Use this as a supplement for your tax software, not a replacement.
+# It makes a lot of assumptions that may not apply to your situation.
+# These include, but are not limited to:
 #
-# implicit assumptions:
 # - single, no dependents, no disabilities
 # - max out traditional 401k
-# - take the standard deduction, no donations
+# - take the standard deduction
 # - no alternative minimum tax
 # - all income is from wages, bonuses, RSUs, benefits, stonks, interest
 # - no self-employment, real estate, or other weird income sources
@@ -37,7 +38,7 @@ def do_additional_medicare_tax(medicare_wages):
 def do_net_investment_income_tax(agi, investment_income):
     return max(0.00, min(agi - niit_threshold, investment_income)) * niit_rate
 
-# job-based income
+# Job-based income
 remaining_salary = remaining_pay_periods / pay_periods_per_year * annual_salary
 remaining_imputed_income = imputed_income_per_period * remaining_pay_periods + imputed_income_one_time
 remaining_bonus = annual_salary / bonus_payouts_per_year * bonus_multiplier * remaining_bonus_payouts
@@ -50,12 +51,12 @@ non_investment_income = (
     + remaining_supplemental
 )
 
-# TODO: handle capital loss (neutralizing capital gains with losses,
+# TODO: Handle capital loss (neutralizing capital gains with losses,
 # 3k loss deduction limit, etc).
 assert long_term_capital_gains >= 0.00
 assert short_term_capital_gains >= 0.00
 
-# investment income
+# Investment income
 long_term_investment_income = other_long_term_investment_income + long_term_capital_gains
 short_term_investment_income = other_short_term_investment_income + short_term_capital_gains
 investment_income = (
@@ -63,7 +64,7 @@ investment_income = (
     + short_term_investment_income
 )
 
-# taxable income
+# Taxable income
 income = non_investment_income + investment_income
 pre_tax_deductions_without_401k = pre_tax_deductions_per_period * pay_periods_per_year + pre_tax_deductions_one_time
 pre_tax_deductions = pre_tax_deductions_without_401k + max_401k
@@ -73,7 +74,7 @@ qbi_deduction = section_199a_dividends * qbi_deduction_rate
 taxable_income = max(0.00, agi - standard_deduction - qbi_deduction)
 ordinary_tax_rate_income = max(0.00, taxable_income - long_term_investment_income)
 
-# tax
+# Total tax
 income_tax = do_income_tax(ordinary_tax_rate_income)
 capital_gains_tax = do_capital_gains_tax(taxable_income, long_term_investment_income)
 additional_medicare_tax = do_additional_medicare_tax(medicare_wages)
@@ -89,7 +90,7 @@ total_tax_without_amt = (
 )
 total_tax = total_tax_without_amt + additional_medicare_tax
 
-# withholding
+# Withholding
 withholding_salary = ytd_withholding + last_withholding * remaining_pay_periods
 withholding_supplemental = remaining_supplemental * supplemental_withholding_rate
 withholding = withholding_salary + withholding_supplemental
