@@ -52,35 +52,39 @@ remaining_rsu_shares = (
 # Investment income
 # --------------------------------------
 
-# Long and short term capital gains (or losses)
+# Taxable interest (e.g. savings account, CD, tax refund)
+taxable_interest = (
+    + 0.00
+)
+
+# Long and short term capital gains (or losses), either from selling
+# stonks or from capital gain distributions.
 long_term_capital_gains = (
-    + 0.00  # long term capital gains
+    + 0.00  # stonks
+    + 0.00  # capital gain distributions
 )
 short_term_capital_gains = (
-    + 0.00  # short term capital gains
+    + 0.00  # stonks
     + 0.00  # gains on RSUs between vest -> sell
 )
 
-# Investment income that's taxed at the long term capital gains rate,
-# EXCLUDING long term capital gains itself. Non-exhaustive list:
-#
-# - capital gain distributions
-# - qualified dividends
-other_long_term_investment_income = (
-    + 0.00  # capital gain distributions
-    + 0.00  # qualified dividends
+# Total ordinary dividends from 1099-DIV. INCLUDE qualified
+# dividends and section 199A dividends in this value.
+total_ordinary_dividends = (
+    + 0.00
 )
 
-# Investment income that's taxed at the ordinary income tax rate,
-# EXCLUDING short term capital gains itself. Non-exhaustive list:
-#
-# - interest (savings, CD, tax refund, etc)
-# - non-qualified dividends (ordinary dividends - qualified dividends)
-other_short_term_investment_income = (
-    + 0.00  # savings interest
-    + 0.00  # non-qualified dividends
+# Qualified dividends from 1099-DIV.
+qualified_dividends = (
+    + 0.00
 )
 
-# Deductions and credits from 1099-DIV
-section_199a_dividends = 0.00
-foreign_tax_paid = 0.00
+# Section 199A dividends from 1099-DIV.
+section_199a_dividends = (
+    + 0.00
+)
+
+# Foreign tax paid from 1099-DIV.
+foreign_tax_paid = (
+    + 0.00
+)

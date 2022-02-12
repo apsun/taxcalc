@@ -12,8 +12,8 @@
 # - all income is from wages, bonuses, RSUs, benefits, stonks, interest
 # - no self-employment, real estate, or other weird income sources
 
-from laws_2022 import *
-from data_2022 import *
+from laws_2021 import *
+from data_2021 import *
 
 def do_tax(base, x, brackets):
     total = 0.00
@@ -29,8 +29,8 @@ def do_tax(base, x, brackets):
 def do_income_tax(ordinary_tax_rate_income):
     return do_tax(ordinary_tax_rate_income, ordinary_tax_rate_income, tax_brackets)
 
-def do_capital_gains_tax(taxable_income, long_term_investment_income):
-    return do_tax(taxable_income, long_term_investment_income, long_term_tax_brackets)
+def do_capital_gains_tax(taxable_income, long_term_rate_investment_income):
+    return do_tax(taxable_income, long_term_rate_investment_income, long_term_tax_brackets)
 
 def do_additional_medicare_tax(medicare_wages):
     return max(0.00, medicare_wages - amt_threshold) * amt_rate
@@ -57,11 +57,20 @@ assert long_term_capital_gains >= 0.00
 assert short_term_capital_gains >= 0.00
 
 # Investment income
-long_term_investment_income = other_long_term_investment_income + long_term_capital_gains
-short_term_investment_income = other_short_term_investment_income + short_term_capital_gains
+total_capital_gains = long_term_capital_gains + short_term_capital_gains
+long_term_rate_investment_income = (
+    + long_term_capital_gains
+    + qualified_dividends
+)
+short_term_rate_investment_income = (
+    + short_term_capital_gains
+    + taxable_interest
+    + total_ordinary_dividends
+    - qualified_dividends
+)
 investment_income = (
-    + long_term_investment_income
-    + short_term_investment_income
+    + long_term_rate_investment_income
+    + short_term_rate_investment_income
 )
 
 # Taxable income
@@ -72,11 +81,11 @@ medicare_wages = non_investment_income - pre_tax_deductions_without_401k
 agi = income - pre_tax_deductions
 qbi_deduction = section_199a_dividends * qbi_deduction_rate
 taxable_income = max(0.00, agi - standard_deduction - qbi_deduction)
-ordinary_tax_rate_income = max(0.00, taxable_income - long_term_investment_income)
+ordinary_tax_rate_income = max(0.00, taxable_income - long_term_rate_investment_income)
 
 # Total tax
 income_tax = do_income_tax(ordinary_tax_rate_income)
-capital_gains_tax = do_capital_gains_tax(taxable_income, long_term_investment_income)
+capital_gains_tax = do_capital_gains_tax(taxable_income, long_term_rate_investment_income)
 additional_medicare_tax = do_additional_medicare_tax(medicare_wages)
 net_investment_income_tax = do_net_investment_income_tax(agi, investment_income)
 tax_credit = (
@@ -88,13 +97,16 @@ total_tax_without_amt = (
     + net_investment_income_tax
     - tax_credit
 )
-total_tax = total_tax_without_amt + additional_medicare_tax
+total_tax = (
+    + total_tax_without_amt
+    + additional_medicare_tax
+)
 
 # Withholding
 withholding_salary = ytd_withholding + last_withholding * remaining_pay_periods
 withholding_supplemental = remaining_supplemental * supplemental_withholding_rate
-withholding = withholding_salary + withholding_supplemental
-extra_withholding = total_tax_without_amt - withholding
+withholding_without_amt = withholding_salary + withholding_supplemental
+extra_withholding = total_tax_without_amt - withholding_without_amt
 extra_withholding_per_pay_period = None
 if remaining_pay_periods > 0:
     extra_withholding_per_pay_period = extra_withholding / remaining_pay_periods
