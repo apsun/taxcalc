@@ -7,8 +7,6 @@ I have verified that it returns accurate results on MY past year returns,
 however, do not expect it to be accurate on your own return. There is
 absolutely zero warranty provided. Use with caution.
 
-## Notice
-
 ## Usage
 
 Copy `data_example.py` to a new file, e.g. `data_2022.py`. Replace the
