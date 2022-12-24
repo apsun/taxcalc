@@ -38,20 +38,6 @@ def do_additional_medicare_tax(medicare_wages):
 def do_net_investment_income_tax(agi, investment_income):
     return max(0.00, min(agi - niit_threshold, investment_income)) * niit_rate
 
-def do_offset_gain_with_loss(a, b):
-    if a > 0.00 and b < 0.00:
-        offset = min(a, -b)
-        a -= offset
-        b += offset
-    return (a, b)
-
-def do_cap_loss(gains, max_deduction):
-    if gains >= 0.00:
-        return (gains, 0.00)
-    if gains < -max_deduction:
-        return (-max_deduction, -gains - max_deduction)
-    return (gains, 0.00)
-
 # Job-based income
 remaining_salary = remaining_pay_periods / pay_periods_per_year * annual_salary
 remaining_imputed_income = imputed_income_per_period * remaining_pay_periods + imputed_income_one_time
@@ -66,35 +52,19 @@ non_investment_income = (
 )
 
 # Investment income
-long_term_capital_gains, short_term_capital_gains = do_offset_gain_with_loss(
-    long_term_capital_gains,
-    short_term_capital_gains
-)
-short_term_capital_gains, long_term_capital_gains = do_offset_gain_with_loss(
-    short_term_capital_gains,
-    long_term_capital_gains
-)
-short_term_capital_gains, short_term_capital_loss_carryover = do_cap_loss(
-    short_term_capital_gains,
-    max_capital_loss_deduction
-)
-long_term_capital_gains, long_term_capital_loss_carryover = do_cap_loss(
-    long_term_capital_gains,
-    max_capital_loss_deduction - max(-short_term_capital_gains, 0.00)
-)
+total_capital_gains = long_term_capital_gains + short_term_capital_gains
+capped_capital_gains = max(total_capital_gains, -max_capital_loss_deduction)
+long_term_rate_capital_gains = max(0.00, min(long_term_capital_gains, total_capital_gains))
+# TODO: calculate short and long term capital loss carryover
+
 long_term_rate_investment_income = (
-    + long_term_capital_gains
+    + long_term_rate_capital_gains
     + qualified_dividends
 )
-short_term_rate_investment_income = (
-    + short_term_capital_gains
+investment_income = (
+    + capped_capital_gains
     + taxable_interest
     + total_ordinary_dividends
-    - qualified_dividends
-)
-investment_income = (
-    + long_term_rate_investment_income
-    + short_term_rate_investment_income
 )
 
 # Taxable income
