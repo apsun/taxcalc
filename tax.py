@@ -38,6 +38,19 @@ def do_additional_medicare_tax(medicare_wages):
 def do_net_investment_income_tax(agi, investment_income):
     return max(0.00, min(agi - niit_threshold, investment_income)) * niit_rate
 
+def do_capital_loss_carryover(capped_capital_gains, short_term_capital_gains, long_term_capital_gains):
+    capped_loss = -capped_capital_gains
+    short_term_loss = max(0.00, -short_term_capital_gains)
+    long_term_gains = max(0.00, long_term_capital_gains)
+    short_term_carryover = max(0.00, short_term_loss - capped_loss - long_term_gains)
+
+    long_term_loss = max(0.00, -long_term_capital_gains)
+    short_term_gains = max(0.00, short_term_capital_gains)
+    remaining_capped_loss = max(0.00, capped_loss - short_term_loss)
+    long_term_carryover = max(0.00, long_term_loss - remaining_capped_loss - short_term_gains)
+
+    return (short_term_carryover, long_term_carryover)
+
 # Job-based income
 remaining_salary = remaining_pay_periods / pay_periods_per_year * annual_salary
 remaining_imputed_income = imputed_income_per_period * remaining_pay_periods + imputed_income_one_time
@@ -55,8 +68,11 @@ non_investment_income = (
 total_capital_gains = long_term_capital_gains + short_term_capital_gains
 capped_capital_gains = max(total_capital_gains, -max_capital_loss_deduction)
 long_term_rate_capital_gains = max(0.00, min(long_term_capital_gains, total_capital_gains))
-# TODO: calculate short and long term capital loss carryover
-
+short_term_capital_loss_carryover, long_term_capital_loss_carryover = do_capital_loss_carryover(
+    capped_capital_gains,
+    short_term_capital_gains,
+    long_term_capital_gains,
+)
 long_term_rate_investment_income = (
     + long_term_rate_capital_gains
     + qualified_dividends
