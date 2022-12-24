@@ -123,4 +123,6 @@ if remaining_pay_periods > 0:
 
 for k, v in globals().copy().items():
     if "__" not in k and isinstance(v, (float, int)):
+        if isinstance(v, float) and not k.endswith("_rate"):
+            v = f"{v:.02f}"
         print(f"{k} = {v}")
