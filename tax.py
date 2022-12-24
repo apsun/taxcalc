@@ -12,8 +12,8 @@
 # - all income is from wages, bonuses, RSUs, benefits, stonks, interest
 # - no self-employment, real estate, or other weird income sources
 
-from laws_2021 import *
-from data_2021 import *
+from laws_2022 import *
+from data_2022 import *
 
 def do_tax(base, x, brackets):
     total = 0.00
@@ -38,6 +38,20 @@ def do_additional_medicare_tax(medicare_wages):
 def do_net_investment_income_tax(agi, investment_income):
     return max(0.00, min(agi - niit_threshold, investment_income)) * niit_rate
 
+def do_offset_gain_with_loss(a, b):
+    if a > 0.00 and b < 0.00:
+        offset = min(a, -b)
+        a -= offset
+        b += offset
+    return (a, b)
+
+def do_cap_loss(gains, max_deduction):
+    if gains >= 0.00:
+        return (gains, 0.00)
+    if gains < -max_deduction:
+        return (-max_deduction, -gains - max_deduction)
+    return (gains, 0.00)
+
 # Job-based income
 remaining_salary = remaining_pay_periods / pay_periods_per_year * annual_salary
 remaining_imputed_income = imputed_income_per_period * remaining_pay_periods + imputed_income_one_time
@@ -51,13 +65,23 @@ non_investment_income = (
     + remaining_supplemental
 )
 
-# TODO: Handle capital loss (neutralizing capital gains with losses,
-# 3k loss deduction limit, etc).
-assert long_term_capital_gains >= 0.00
-assert short_term_capital_gains >= 0.00
-
 # Investment income
-total_capital_gains = long_term_capital_gains + short_term_capital_gains
+long_term_capital_gains, short_term_capital_gains = do_offset_gain_with_loss(
+    long_term_capital_gains,
+    short_term_capital_gains
+)
+short_term_capital_gains, long_term_capital_gains = do_offset_gain_with_loss(
+    short_term_capital_gains,
+    long_term_capital_gains
+)
+short_term_capital_gains, short_term_capital_loss_carryover = do_cap_loss(
+    short_term_capital_gains,
+    max_capital_loss_deduction
+)
+long_term_capital_gains, long_term_capital_loss_carryover = do_cap_loss(
+    long_term_capital_gains,
+    max_capital_loss_deduction - max(-short_term_capital_gains, 0.00)
+)
 long_term_rate_investment_income = (
     + long_term_capital_gains
     + qualified_dividends

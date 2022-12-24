@@ -62,10 +62,12 @@ taxable_interest = (
 long_term_capital_gains = (
     + 0.00  # stonks
     + 0.00  # capital gain distributions
+    - 0.00  # long term capital loss carryover from previous year
 )
 short_term_capital_gains = (
     + 0.00  # stonks
     + 0.00  # gains on RSUs between vest -> sell
+    - 0.00  # short term capital loss carryover from previous year
 )
 
 # Total ordinary dividends from 1099-DIV. INCLUDE qualified

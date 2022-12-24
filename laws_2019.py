@@ -22,3 +22,4 @@ amt_threshold = 200000.00
 niit_rate = 0.038
 niit_threshold = 200000.00
 qbi_deduction_rate = 0.20
+max_capital_loss_deduction = 3000.00
