@@ -12,8 +12,8 @@
 # - all income is from wages, bonuses, RSUs, benefits, stonks, interest
 # - no self-employment, real estate, or other weird income sources
 
-from laws_2022 import *
-from data_2022 import *
+from laws_2023 import *
+from data_2023 import *
 
 def do_tax(base, x, brackets):
     total = 0.00
