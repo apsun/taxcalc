@@ -51,7 +51,7 @@ def do_capital_loss_carryover(capped_capital_gains, short_term_capital_gains, lo
 
     return (short_term_carryover, long_term_carryover)
 
-# Job-based income
+# W-2 income
 remaining_salary = remaining_pay_periods / pay_periods_per_year * annual_salary
 remaining_imputed_income = imputed_income_per_period * remaining_pay_periods + imputed_income_one_time
 remaining_bonus = annual_salary / bonus_payouts_per_year * bonus_multiplier * remaining_bonus_payouts
@@ -84,11 +84,11 @@ investment_income = (
 )
 
 # Taxable income
-income = non_investment_income + investment_income
+income_without_deductions = non_investment_income + investment_income
 pre_tax_deductions_without_401k = pre_tax_deductions_per_period * pay_periods_per_year + pre_tax_deductions_one_time
 pre_tax_deductions = pre_tax_deductions_without_401k + max_401k
 medicare_wages = non_investment_income - pre_tax_deductions_without_401k
-agi = income - pre_tax_deductions
+total_income = agi = magi = income_without_deductions - pre_tax_deductions
 qbi_deduction = section_199a_dividends * qbi_deduction_rate
 taxable_income = max(0.00, agi - standard_deduction - qbi_deduction)
 ordinary_tax_rate_income = max(0.00, taxable_income - long_term_rate_investment_income)
@@ -101,22 +101,25 @@ net_investment_income_tax = do_net_investment_income_tax(agi, investment_income)
 tax_credit = (
     + foreign_tax_paid
 )
-total_tax_without_amt = (
+tax = (
     + income_tax
     + capital_gains_tax
+)
+other_tax = (
     + net_investment_income_tax
-    - tax_credit
+    + additional_medicare_tax
 )
 total_tax = (
-    + total_tax_without_amt
-    + additional_medicare_tax
+    + tax
+    + other_tax
+    - tax_credit
 )
 
 # Withholding
 withholding_salary = ytd_withholding + last_withholding * remaining_pay_periods
 withholding_supplemental = remaining_supplemental * supplemental_withholding_rate
 withholding_without_amt = withholding_salary + withholding_supplemental
-extra_withholding = total_tax_without_amt - withholding_without_amt
+extra_withholding = (total_tax - additional_medicare_tax) - withholding_without_amt
 extra_withholding_per_pay_period = None
 if remaining_pay_periods > 0:
     extra_withholding_per_pay_period = extra_withholding / remaining_pay_periods
