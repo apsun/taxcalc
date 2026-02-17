@@ -12,6 +12,9 @@ last_withholding = 123.45
 ytd_withholding = 123.45
 ytd_gross_pay = 1234.56
 
+# How much you contributed to a traditional 401k
+traditional_401k_contribution = 23500.00
+
 # Imputed income (taxable benefits). Typically things like exercise
 # benefit, disability/life insurance. Do NOT include imputed income
 # in the one-time value that has already been added to your gross pay.
@@ -88,5 +91,12 @@ section_199a_dividends = (
 
 # Foreign tax paid from 1099-DIV.
 foreign_tax_paid = (
+    + 0.00
+)
+
+# Income from converting traditional -> roth IRA
+# e.g. if you contribute 7000 to traditional, gain 10 in interest,
+# and convert 7010 to roth, this is 10
+ira_backdoor_income = (
     + 0.00
 )

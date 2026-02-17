@@ -6,7 +6,6 @@
 # These include, but are not limited to:
 #
 # - single, no dependents, no disabilities
-# - max out traditional 401k
 # - take the standard deduction
 # - no alternative minimum tax
 # - all income is from wages, bonuses, RSUs, benefits, stonks, interest
@@ -83,10 +82,15 @@ investment_income = (
     + total_ordinary_dividends
 )
 
+# Income not subject to medicare or NIIT taxes
+other_income = (
+    + ira_backdoor_income
+)
+
 # Taxable income
-income_without_deductions = non_investment_income + investment_income
+income_without_deductions = non_investment_income + investment_income + other_income
 pre_tax_deductions_without_401k = pre_tax_deductions_per_period * pay_periods_per_year + pre_tax_deductions_one_time
-pre_tax_deductions = pre_tax_deductions_without_401k + max_401k
+pre_tax_deductions = pre_tax_deductions_without_401k + traditional_401k_contribution
 medicare_wages = non_investment_income - pre_tax_deductions_without_401k
 total_income = agi = magi = income_without_deductions - pre_tax_deductions
 qbi_deduction = section_199a_dividends * qbi_deduction_rate

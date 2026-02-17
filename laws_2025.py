@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-max_401k = 23500.00
-standard_deduction = 15000.00
+standard_deduction = 15750.00
 tax_brackets = [
     (0.10, 11925.00),
     (0.12, 48475.00),
